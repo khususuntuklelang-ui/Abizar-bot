@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Abizar Bot WhatsApp - Full System</title>
+    <style>
+        /* --- RESET & BASE STYLES --- */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            color: #e2e8f0;
+            min-height: 100vh;
+            background-color: #0f0518;
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            transition: background-image 1s ease-in-out;
+            overflow-x: hidden;
+        }
+
+        /* Overlay Gelap Ungu Modern */
+        .main-overlay {
+            background: linear-gradient(to bottom, rgba(15, 5, 24, 0.92), rgba(30, 10, 60, 0.97));
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container { max-width: 500px; width: 100%; position: relative; }
+
+        /* --- HALAMAN AUTH (LOGIN / REGISTER) --- */
+        .auth-box {
+            background: rgba(30, 20, 50, 0.8);
+            border: 1px solid rgba(139, 92, 246, 0.3);
+            border-radius: 20px;
+            padding: 40px 30px;
+            text-align: center;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 0 40px rgba(139, 92, 246, 0.15);
+        }
+
+        .auth-title {
+            font-size: 1.8rem; margin-bottom: 10px;
+            background: linear-gradient(to right, #fff, #c4b5fd);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+
+        .auth-desc { font-size: 0.9rem; color: #94a3b8; margin-bottom: 30px; }
+
+        .input-group { margin-bottom: 20px; text-align: left; }
+        .input-group label { display: block; font-size: 0.85rem; color: #a78bfa; margin-bottom: 8px; font-weight: bold; }
+        .input-field {
+            width: 100%; padding: 14px; border-radius: 10px;
+            border: 1px solid rgba(139, 92, 246, 0.3);
+            background: rgba(15, 5, 24, 0.6); color: white;
+            font-size: 1rem; outline: none; transition: all 0.3s;
+        }
+        .input-field:focus { border-color: #8b5cf6; box-shadow: 0 0 10px rgba(139, 92, 246, 0.3); }
+
+        .btn-auth {
+            width: 100%; padding: 15px; border-radius: 10px; border: none;
+            background: linear-gradient(135deg, #8b5cf6, #3b82f6);
+            color: white; font-weight: bold; font-size: 1rem; cursor: pointer;
+            box-shadow: 0 0 20px rgba(139, 92, 246, 0.4); transition: transform 0.2s;
+        }
+        .btn-auth:active { transform: scale(0.98); }
+
+        .toggle-auth { margin-top: 20px; font-size: 0.85rem; color: #94a3b8; }
+        .toggle-auth span { color: #a78bfa; cursor: pointer; text-decoration: underline; }
+        .error-msg { color: #f87171; font-size: 0.85rem; margin-bottom: 15px; display: none; }
+
+        /* --- HALAMAN DASHBOARD (KONTEN UTAMA) --- */
+        #dashboard-page { display: none; } 
+
+        header { text-align: center; margin-bottom: 30px; }
+        .brand-tag {
+            display: inline-block; background: rgba(139, 92, 246, 0.2);
+            color: #a78bfa; padding: 6px 16px; border-radius: 50px;
+            font-size: 0.8rem; font-weight: bold; letter-spacing: 1px;
+            margin-bottom: 20px; border: 1px solid rgba(139, 92, 246, 0.3);
+        }
+        
+        h1 {
+            font-size: 2.2rem; line-height: 1.2; margin-bottom: 15px;
+            background: linear-gradient(to right, #fff, #c4b5fd);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+        
+        .highlight-text {
+            color: #d8b4fe; font-weight: 800;
+            text-shadow: 0 0 20px rgba(168, 85, 247, 0.5);
+        }
+
+        .desc { font-size: 0.95rem; color: #94a3b8; line-height: 1.6; margin-bottom: 30px; }
+
+        .btn-primary {
+            display: block; width: 100%; text-align: center;
+            background: linear-gradient(135deg, #8b5cf6, #3b82f6);
+            color: white; padding: 16px; border-radius: 12px;
+            text-decoration: none; font-weight: bold; font-size: 1.1rem;
+            box-shadow: 0 0 25px rgba(139, 92, 246, 0.4); margin-bottom: 40px;
+        }
+
+        .section-title {
+            text-align: center; font-size: 1.1rem; color: #c4b5fd;
+            letter-spacing: 1px; margin-bottom: 20px; text-transform: uppercase;
+        }
+
+        .pricing-grid { 
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); 
+            gap: 15px; margin-bottom: 30px; 
+        }
+
+        .price-card {
+            background: rgba(30, 20, 50, 0.6); border: 1px solid rgba(139, 92, 246, 0.2);
+            border-radius: 16px; padding: 20px; transition: all 0.3s ease;
+        }
+        .price-card:hover { border-color: rgba(139, 92, 246, 0.6); transform: translateY(-5px); }
+
+        .pkg-name { font-size: 0.95rem; font-weight: bold; color: #fff; margin-bottom: 8px; }
+        .pkg-price { font-size: 1.6rem; font-weight: 800; color: #a78bfa; margin-bottom: 10px; }
+        .pkg-detail { font-size: 0.8rem; color: #94a3b8; margin-bottom: 4px; }
+        
+        .badge-best {
+            background: linear-gradient(90deg, #f59e0b, #d97706); color: #fff;
+            font-size: 0.6rem; font-weight: bold; padding: 2px 6px;
+            border-radius: 4px; margin-left: 6px; vertical-align: middle;
+        }
+
+        .features-list { list-style: none; }
+        .features-list li { 
+            padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.05); 
+            font-size: 0.85rem; color: #cbd5e1; display: flex; align-items: center; gap: 10px;
+        }
+        .icon-check { color: #8b5cf6; font-weight: bold; }
+
+        .logout-btn {
+            display: block; width: 100%; margin-top: 30px; padding: 12px;
+            background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #fca5a5; border-radius: 10px; text-decoration: none;
+            text-align: center; font-size: 0.9rem; cursor: pointer;
+        }
+
+        footer { text-align: center; margin-top: 40px; font-size: 0.75rem; color: #64748b; }
+        footer a { color: #a78bfa; text-decoration: none; }
+
+        @media (max-width: 480px) {
+            h1 { font-size: 1.8rem; }
+            .pricing-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="main-overlay">
+    <div class="container">
+        
+        <!-- === HALAMAN AUTH (LOGIN/REGISTER) === -->
+        <div id="auth-page" class="auth-box">
+            <h2 class="auth-title" id="auth-title">Masuk ke Sistem</h2>
+            <p class="auth-desc" id="auth-desc">Silakan login untuk mengakses layanan Abizar Bot.</p>
+            
+            <div class="error-msg" id="error-msg"></div>
+
+            <div class="input-group">
+                <label>Username</label>
+                <input type="text" id="username" class="input-field" placeholder="Masukkan username...">
+            </div>
+            
+            <div class="input-group">
+                <label>Password</label>
+                <input type="password" id="password" class="input-field" placeholder="Masukkan password...">
+            </div>
+
+            <button class="btn-auth" id="auth-btn" onclick="handleLogin()">MASUK SEKARANG</button>
+
+            <div class="toggle-auth">
+                <span id="toggle-text">Belum punya akun? <span onclick="toggleAuthMode()">Daftar disini</span></span>
+            </div>
+        </div>
+
+        <!-- === HALAMAN DASHBOARD (KONTEN UTAMA) === -->
+        <div id="dashboard-page">
+            <header>
+                <span class="brand-tag">ABIZAR BOT SYSTEM</span>
+                <h1>Selamat Datang, <span id="user-display" class="highlight-text">User</span>!</h1>
+                <p class="desc">
+                    Anda berhasil masuk. Nikmati layanan bot otomatis 24/7 tanpa batas. Kelola grup dan pesan pribadi dengan mudah.
+                </p>
+                <a href="https://wa.me/62881012248777" class="btn-primary">Aktifkan Bot Sekarang →</a>
+            </header>
+
+            <div>
+                <div class="section-title">PILIH PAKET LAYANAN</div>
+                <div class="pricing-grid">
+                    <div class="price-card">
+                        <div class="pkg-name">PAKET HARIAN</div>
+                        <div class="pkg-price">Rp 3.000</div>
+                        <div class="pkg-detail">️ Aktif 1 Hari</div>
+                    </div>
+                    <div class="price-card">
+                        <div class="pkg-name">PAKET MINGGUAN</div>
+                        <div class="pkg-price">Rp 5.000</div>
+                        <div class="pkg-detail"> Aktif 7 Hari</div>
+                    </div>
+                    <div class="price-card" style="border-color: rgba(139, 92, 246, 0.8);">
+                        <div class="pkg-name">PAKET BULANAN <span class="badge-best">BEST</span></div>
+                        <div class="pkg-price">Rp 9.000</div>
+                        <div class="pkg-detail">️ Aktif 30 Hari</div>
+                    </div>
+                    <div class="price-card">
+                        <div class="pkg-name">PAKET PERMANEN</div>
+                        <div class="pkg-price">Rp 12.000</div>
+                        <div class="pkg-detail"> Selamanya</div>
+                    </div>
+                </div>
+            </div>
+
+            <div>
+                <div class="section-title">FITUR PREMIUM</div>
+                <div class="price-card">
+                    <ul class="features-list">
+                        <li><span class="icon-check">✓</span> Auto-reply pesan masuk 24 jam</li>
+                        <li><span class="icon-check">✓</span> Welcome message member baru</li>
+                        <li><span class="icon-check">✓</span> Broadcast terjadwal</li>
+                        <li><span class="icon-check">✓</span> Anti-spam & filter kata kasar</li>
+                        <li><span class="icon-check">✓</span> Manajemen grup lengkap</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="logout-btn" onclick="handleLogout()">Keluar dari Akun</div>
+
+            <footer>
+                © 2024 Abizar Bot WhatsApp System<br>
+                <a href="https://whatsapp.com/channel/0029Vb8SfeOKbYMW50uLcE2u" target="_blank">Join Saluran Info</a>
+            </footer>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    // --- LOGIKA AUTHENTICATION (LOCALSTORAGE) ---
+    let isRegisterMode = false;
+
+    window.onload = function() {
+        const currentUser = localStorage.getItem('abizar_user');
+        if (currentUser) showDashboard(currentUser);
+    };
+
+    function toggleAuthMode() {
+        isRegisterMode = !isRegisterMode;
+        const title = document.getElementById('auth-title');
+        const desc = document.getElementById('auth-desc');
+        const btn = document.getElementById('auth-btn');
+        const toggle = document.getElementById('toggle-text');
+        const error = document.getElementById('error-msg');
+        
+        error.style.display = 'none';
+        
+        if (isRegisterMode) {
+            title.innerText = "Buat Akun Baru";
+            desc.innerText = "Daftar gratis untuk mulai menggunakan layanan.";
+            btn.innerText = "DAFTAR SEKARANG";
+            btn.onclick = handleRegister;
+            toggle.innerHTML = 'Sudah punya akun? <span onclick="toggleAuthMode()">Masuk disini</span>';
+        } else {
+            title.innerText = "Masuk ke Sistem";
+            desc.innerText = "Silakan login untuk mengakses layanan Abizar Bot.";
+            btn.innerText = "MASUK SEKARANG";
+            btn.onclick = handleLogin;
+            toggle.innerHTML = 'Belum punya akun? <span onclick="toggleAuthMode()">Daftar disini</span>';
+        }
+    }
+
+    function showError(msg) {
+        const errorEl = document.getElementById('error-msg');
+        errorEl.innerText = msg;
+        errorEl.style.display = 'block';
+    }
+
+    function handleRegister() {
+        const user = document.getElementById('username').value.trim();
+        const pass = document.getElementById('password').value.trim();
+
+        if (!user || !pass) return showError("Username dan Password tidak boleh kosong!");
+        if (localStorage.getItem('user_' + user)) return showError("Username sudah terdaftar!");
+
+        localStorage.setItem('user_' + user, JSON.stringify({ username: user, password: pass }));
+        alert("Pendaftaran Berhasil! Silakan login.");
+        toggleAuthMode();
+    }
+
+    function handleLogin() {
+        const user = document.getElementById('username').value.trim();
+        const pass = document.getElementById('password').value.trim();
+
+        if (!user || !pass) return showError("Isi semua kolom!");
+
+        const storedData = localStorage.getItem('user_' + user);
+        if (!storedData) return showError("Akun tidak ditemukan!");
+        
+        const userData = JSON.parse(storedData);
+        if (userData.password !== pass) return showError("Password salah!");
+
+        localStorage.setItem('abizar_user', user);
+        showDashboard(user);
+    }
+
+    function showDashboard(username) {
+        document.getElementById('auth-page').style.display = 'none';
+        document.getElementById('dashboard-page').style.display = 'block';
+        document.getElementById('user-display').innerText = username;
+    }
+
+    function handleLogout() {
+        localStorage.removeItem('abizar_user');
+        document.getElementById('dashboard-page').style.display = 'none';
+        document.getElementById('auth-page').style.display = 'block';
+        document.getElementById('username').value = '';
+        document.getElementById('password').value = '';
+        document.getElementById('error-msg').style.display = 'none';
+    }
+
+    // --- SCRIPT SLIDER BACKGROUND OTOMATIS ---
+    const backgrounds = [
+        'https://www.upload.ee/image/19506124/file.jpg', 
+        'https://kappa.lol/1PEd68'                        
+    ];
+    let currentIndex = 0;
+    function changeBackground() {
+        document.body.style.backgroundImage = `url('${backgrounds[currentIndex]}')`;
+        currentIndex = (currentIndex + 1) % backgrounds.length;
+    }
+    changeBackground();
+    setInterval(changeBackground, 5000); 
+</script>
+
+</body>
+</html>
